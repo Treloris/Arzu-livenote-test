@@ -1,0 +1,805 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>苏丹的帮派 · 工作日志 | 档案</title>
+
+<style>
+:root{
+  --bg:#0b0f10;
+  --panel:#0f1415;
+  --accent:#7bd389;
+  --muted:#9aa6a7;
+  --glass: rgba(255,255,255,0.03);
+  --mono: "JetBrains Mono", "Roboto Mono", monospace;
+  --radius:8px;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: linear-gradient(180deg, #060707 0%, #0b0f10 100%);
+  color:#e6f0ef;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+header{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  padding:18px 24px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.02), transparent);
+  border-bottom:1px solid rgba(255,255,255,0.03);
+  position:sticky;
+  top:0;
+  z-index:10;
+  backdrop-filter: blur(6px);
+}
+
+.brand{display:flex;gap:12px;align-items:center}
+.logo{
+  width:48px;height:48px;border-radius:8px;
+  background:linear-gradient(135deg,#0f1516,#061011);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-weight:700;color:var(--accent);
+  box-shadow: 0 4px 18px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+}
+h1{font-size:16px;margin:0}
+.sub{font-size:12px;color:var(--muted);margin-top:2px}
+
+.container{
+  display:grid;
+  grid-template-columns: 280px 1fr 360px;
+  gap:20px;
+  padding:22px;
+  max-width:1300px;margin:20px auto;
+}
+
+aside.panel{
+  background:var(--panel);
+  border-radius:var(--radius);
+  padding:14px;
+  min-height:520px;
+  box-shadow: 0 6px 30px rgba(0,0,0,0.5);
+  border:1px solid rgba(255,255,255,0.02);
+}
+
+.search{display:flex;gap:8px}
+.search input{
+  flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);
+  background:var(--glass);color:inherit;font-family:var(--mono);
+}
+
+.filters{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.chip{
+  display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.02);
+  color:var(--muted);font-size:13px;border:1px solid rgba(255,255,255,0.02);
+  cursor:pointer;
+}
+
+main{display:flex;flex-direction:column;gap:14px}
+.timeline{display:flex;flex-direction:column;gap:10px;max-height:64vh;overflow:auto;padding-right:6px}
+
+.entry{
+  background: linear-gradient(180deg, rgba(255,255,255,0.015), transparent);
+  border-radius:10px;padding:14px;border:1px solid rgba(255,255,255,0.02);
+  display:flex;gap:14px;align-items:flex-start;
+  cursor:pointer;
+}
+.entry:hover{background:#111416}
+.meta{width:120px;font-family:var(--mono);font-size:13px;color:var(--muted)}
+.meta .time{color:var(--muted);font-size:12px}
+.card{flex:1}
+.title{font-weight:700;margin:0 0 6px 0;color:#eafaf0}
+.body{color:#d7e7e3;font-size:14px;line-height:1.45;white-space:pre-wrap;font-family:Inter,Arial}
+.safe-link {color: var(--accent);text-decoration: underline;cursor: pointer;}
+.safe-link:hover {color: #b9f3c8;text-shadow: 0 0 6px rgba(185,243,200,0.5);}
+.tags{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+.tag{
+  font-family:var(--mono);
+  font-size:12px;
+  padding:6px 8px;
+  border-radius:6px;
+  background:rgba(0,0,0,0.2);
+  color:var(--accent);
+  border:1px solid rgba(123,211,137,0.08);
+}
+.tag.strike{
+  color:#556b5d;
+  text-decoration:line-through;
+  opacity:0.6;
+  border-color: rgba(255,255,255,0.05);
+  background: rgba(255,0,0,0.03);
+  position:relative;
+}
+.tag.strike::after{
+  content:'✕';
+  position:absolute;
+  right:-8px;top:-6px;font-size:10px;color:#a55;opacity:0.6;
+}
+
+.inspector{
+  background:var(--panel);padding:14px;border-radius:var(--radius);
+  min-height:520px;border:1px solid rgba(255,255,255,0.02);display:flex;flex-direction:column;
+}
+.inspector h3{margin:0 0 8px 0;font-size:14px}
+.field{font-family:var(--mono);font-size:13px;color:var(--muted);margin-bottom:8px}
+
+
+.btn{
+  display:inline-block;padding:10px 12px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);
+  color:var(--muted);cursor:pointer;font-family:var(--mono);font-size:13px;
+}
+.btn.primary{
+  border-color:rgba(123,211,137,0.12);
+  color:var(--accent);
+  font-weight:600;
+}
+.btn.disabled{opacity:0.4;cursor:not-allowed}
+
+/* 代码 / 终端式预览 */
+.terminal{
+  margin-top:12px;padding:12px;border-radius:8px;background:#030606;font-family:var(--mono);font-size:13px;color:#b9f3c8;
+  border:1px solid rgba(255,255,255,0.02);
+  max-height:180px;overflow:auto;
+  white-space: pre-wrap;       /* 保留换行和空格 */
+  word-break: break-word;       /* 超长文本自动换行 */
+}
+
+.new-form {
+  margin-top:14px;
+  border-top:1px solid rgba(255,255,255,0.03);
+  padding-top:12px;
+  display:none;
+}
+.new-form input[type="text"], .new-form textarea {
+  width:100%;padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);
+  background:transparent;color:inherit;font-family:var(--mono);font-size:13px;
+}
+.new-form textarea{min-height:100px;resize:vertical}
+
+.export-option {
+  padding:8px 14px;
+  font-size:13px;
+  cursor:pointer;
+  color:#b6d6b6;
+  border-bottom:1px solid #222;
+  user-select: none;
+}
+.export-option:last-child { border-bottom:none; }
+.export-option:hover { background:#182020; }
+
+    @media (max-width:1100px){
+      .container{
+        grid-template-columns: 1fr;
+        padding:16px;
+        grid-auto-rows: auto;
+      }
+      aside.panel { order: 1; margin-bottom: 12px; }  /* 搜索 + 筛选栏 */
+      main { order: 2; margin-bottom: 12px; }          /* 日志列表 */
+      .inspector { order: 3; }                          /* 详情面板在最下 */
+    }
+</style>
+
+
+</head>
+
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">Arzu</div>
+      <div>
+        <h1>档案 · Arzu-工作日志</h1>
+        <div class="sub">活动记录 / 实时更新</div>
+      </div>
+    </div>
+
+    <div style="margin-left:auto; display:flex; gap:10px; align-items:center; position:relative;">
+      <button class="btn primary" id="newBtn" title="新增记录">新增记录</button>
+
+      <button id="exportBtn" class="btn">导出</button>
+
+      <div id="exportMenu" class="export-menu" style="display:none; position:absolute; top:38px; right:0; background:#0e1416; border:1px solid #333; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.5); z-index:100;">
+        <div class="export-option" data-type="txt">TXT</div>
+        <div class="export-option" data-type="doc">DOC</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- 左侧 -->
+    <aside class="panel" aria-label="筛选面板">
+      <div class="search">
+        <input id="q" placeholder="搜索：关键字 / ID / 标签" />
+      </div>
+
+      <div class="filters" style="margin-top:14px">
+        <div style="font-size:13px;color:var(--muted);">快速筛选</div>
+        <div style="margin-top:8px">
+          <span class="chip" data-filter="all">全部</span>
+          <span class="chip" data-filter="ops">OPS</span>
+          <span class="chip" data-filter="recon">RECON</span>
+          <span class="chip" data-filter="legal">LEGAL</span>
+          <span class="chip" data-filter="audit">AUDIT</span>
+	  <span class="chip" data-filter="deauth">DEAUTH</span>
+	  <span class="chip" data-filter="finance">FINANCE</span>
+	  <span class="chip" data-filter="cleanup">CLEANUP</span>
+        </div>
+
+        <div style="margin-top:12px">
+          <div style="font-size:13px;color:var(--muted)">时间范围</div>
+          <div style="margin-top:8px;display:flex;gap:8px">
+            <input type="date" id="from" />
+            <input type="date" id="to" />
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:18px;font-size:12px;color:var(--muted)">
+         *一般密件* <br> **机密** <br> ***高级机密*** <br> ****最高机密**** - 您没有访问权限 
+      </div>
+    </aside>
+
+    <!-- 中央：时间线 -->
+    <main>
+      <div class="timeline" id="timeline"></div>
+      <div style="display:flex;gap:8px;align-items:center;justify-content:flex-end">
+        <div style="font-size:12px;color:var(--muted)">共 <span id="count">0</span> 条记录</div>
+      </div>
+    </main>
+
+    <!-- 右侧：详情 + 新增共用面板 -->
+    <aside class="inspector" id="inspector" aria-label="详情面板">
+      <h3>日志详情</h3>
+      <div class="field" id="metaId">ID: —</div>
+      <div class="field" id="metaTime">时间: —</div>
+      <div class="field" id="metaTags">标签: —</div>
+
+      <div class="terminal" id="preview">请在左侧选择日志查看详情。</div>
+
+      <!-- 新增表单（共用面板底部） -->
+      <div class="new-form">
+        <h4 style="margin:6px 0;color:var(--muted);font-size:13px">新增记录（保存后不可修改/删除）</h4>
+        <label style="font-size:12px;color:var(--muted)">标题</label>
+        <input type="text" id="newTitle" placeholder="输入标题..." />
+        <label style="font-size:12px;color:var(--muted);margin-top:8px;display:block">标签（英文逗号分隔）</label>
+        <input type="text" id="newTags" placeholder="ops, recon, legal, audit, deauth, finance, cleanup" />
+        <label style="font-size:12px;color:var(--muted);margin-top:8px;display:block">正文</label>
+        <textarea id="newBody" placeholder="输入记录内容..."></textarea>
+        <div style="display:flex;gap:8px;margin-top:10px;justify-content:flex-end">
+          <button class="btn" id="clearNew">清空</button>
+          <button class="btn primary" id="saveNew">保存记录</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+<script>
+/* ----------------------
+   数据持久化与初始化
+   ---------------------- */
+const STORAGE_KEY = 'worklog_v1';
+const TAGS_KEY = 'ARZU_TAGS';
+
+// 默认示例记录（会在 localStorage 为空时使用）
+const DEFAULT_SAMPLE = [
+  {
+    id: "log-0002",
+    time: "2025-10-26T19:03:00Z",
+    title: "合同审阅：条款增改",
+    body: "对接方提交的服务契约存在 3 处模糊条款。建议在 3.2 与 4.1 增加不可撤销声明并指定仲裁地点。校样副本同步修改，我方利润上升7%。",
+    tags: ["legal","finance"],
+    sealed: false
+  },
+  {
+    id: "log-0003",
+    time: "2025-10-25T05:41:00Z",
+    title: "清理任务：移除节点",
+    body: "清除已知泄密成员，移除μ-69穆尔台兹访问权限，生命信息已归档。",
+    tags: ["deauth","cleanup"],
+    sealed: true
+  },
+  {
+    id: "log-0004",
+    time: "2025-10-25T05:41:00Z",
+    title: "清理任务：外部销毁",
+    body: "清除已知泄密成员，销毁λ-112鲁梅拉，生命信息已归档。",
+    tags: ["deauth","cleanup"],
+    strikeTags: ["cleanup"],
+    sealed: true
+  },
+  {
+    id: "log-0005",
+    time: "2025-10-25T05:41:00Z",
+    title: "清理任务：外部销毁",
+    body: "清除已知外部成员，销毁ρ-235233拉伊德，φ-**，生命信息已归档。",
+    tags: ["deauth","cleanup","recon"],
+    sealed: true
+  },
+  {
+    id: "log-0006",
+    time: "2025-10-27T02:14:00Z",
+    title: "脉冲转发：校验已通过",
+    body: "执行回路扫描 — 一处节点返回一致面部信息。δ-hyzg已通过。未发现外链。",
+    tags: ["ops","recon"],
+    sealed: false
+  },
+  {
+    id: "log-0007",
+    time: "2025-10-27T05:23:00Z",
+    title: "脉冲转发：校验已通过",
+    body: "执行回路扫描 — 一处节点返回一致面部信息。δ-hyzg已通过。未发现外链。",
+    tags: ["ops","recon"],
+    sealed: false
+  },
+  {
+    id: "log-0008",
+    time: "2025-10-27T05:23:00Z",
+    title: "交易检收：仓储未确认",
+    body: `交易编号：ARM-2025-0507-222
+接收日期：2025-07-12
+地点：E116-23-17/N39-54-27
+初检状态：合格
+随附文件：20250507已收悉，合格
+入库确认：<a href="#" class="fake-link" data-target="β-7712哲巴尔">β-7712哲巴尔</a>
+保密系数：***
+
+**异常**
+对接方于转接仓库中安置大量摄像头。摄像头已销毁，对接方已销毁，未确认身份。生命信息不完全归档。
+**确认清除**
+申请增加归档流程
+申请封存`,
+    tags: ["ops","recon"],
+    sealed: false
+  }
+];
+
+// 页面初始化时加载已有数据和标签
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_SAMPLE));
+      return DEFAULT_SAMPLE.slice();
+    }
+    return JSON.parse(raw);
+  } catch (e) {
+    console.error('loadData error', e);
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_SAMPLE));
+    return DEFAULT_SAMPLE.slice();
+  }
+}
+
+function saveData(arr) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+}
+
+// 标签存取
+function loadTags() {
+  try {
+    const raw = localStorage.getItem(TAGS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    console.error('loadTags error', e);
+    return [];
+  }
+}
+
+function saveTags(tags) {
+  localStorage.setItem(TAGS_KEY, JSON.stringify(tags));
+}
+
+/* ----------------------
+   应用状态与 DOM 绑定
+   ---------------------- */
+let state = {
+  data: loadData(),
+  filtered: [],
+  selected: null,
+  firstClickShown: false
+};
+
+const timeline = document.getElementById('timeline');
+const countEl = document.getElementById('count');
+const inspector = {
+  id: document.getElementById('metaId'),
+  time: document.getElementById('metaTime'),
+  tags: document.getElementById('metaTags'),
+  preview: document.getElementById('preview')
+};
+
+const inputQ = document.getElementById('q');
+const inputFrom = document.getElementById('from');
+const inputTo = document.getElementById('to');
+const chipEls = document.querySelectorAll('.chip');
+
+/* ----------------------
+   工具：生成唯一 ID（按最大现有编号+1）
+   ---------------------- */
+function makeId(){
+  let maxNum = state.data.reduce((max, item)=>{
+    const n = parseInt(item.id.slice(4));
+    return n > max ? n : max;
+  },0);
+  return 'log-' + String(maxNum + 1).padStart(4,'0');
+}
+
+/* ----------------------
+   渲染逻辑
+   ---------------------- */
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]); }
+
+function renderList(items){
+  timeline.innerHTML = '';
+  items.sort((a,b)=> new Date(b.time) - new Date(a.time));
+
+  items.forEach(item=>{
+    const el = document.createElement('div');
+    el.className = 'entry';
+
+    const tagHTML = (item.tags||[]).map(t=>{
+      const isStrike = Array.isArray(item.strikeTags) && item.strikeTags.includes(t);
+      return `<span class="tag${isStrike?' strike':''}">${escapeHtml(t)}</span>`;
+    }).join('');
+
+    el.innerHTML = `
+      <div class="meta">
+        <div style="font-weight:700">${escapeHtml(item.id)}</div>
+        <div class="time">${new Date(item.time).toLocaleString()}</div>
+        <div style="margin-top:8px;font-size:12px;color:${item.sealed? '#7bd389' : 'var(--muted)'}">${item.sealed? '已封存':'活动'}</div>
+      </div>
+      <div class="card">
+        <div class="title">${escapeHtml(item.title)}</div>
+        <div class="body">${sanitizeHTML(item.body)}</div>
+        <div class="tags">${tagHTML}</div>
+      </div>
+    `;
+
+    el.addEventListener('click', ()=> selectEntry(item.id));
+    timeline.appendChild(el);
+  });
+
+  countEl.textContent = items.length;
+}
+
+/* ----------------------
+   选择与查看（只读）
+   ---------------------- */
+const inspectorPanel = document.getElementById('inspector');
+
+function selectEntry(id){
+  const item = state.data.find(x=>x.id===id);
+  if(!item) return;
+  state.selected = item;
+  inspector.id.textContent = 'ID: ' + item.id;
+  inspector.time.textContent = '时间: ' + new Date(item.time).toLocaleString();
+  inspector.tags.innerHTML = '标签: ' + item.tags.map(t=>{
+    const strike = item.strikeTags?.includes(t);
+    return `<span style="margin-right:6px;${strike?'text-decoration:line-through;color:#556b5d;':''}">${t}</span>`;
+  }).join('');
+  inspector.preview.innerHTML = item.body;
+
+  // 滚动到详情面板（平滑动画）
+  inspectorPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ----------------------
+   过滤（搜索/筛选/时间）
+   ---------------------- */
+function applyFilters(){
+  const q = (inputQ.value||'').trim().toLowerCase();
+  const from = inputFrom.value;
+  const to = inputTo.value;
+  state.filtered = state.data.filter(item=>{
+    if(q){
+      const inText = (item.id + ' ' + item.title + ' ' + item.body + ' ' + (item.tags||[]).join(' ')).toLowerCase();
+      if(!inText.includes(q)) return false;
+    }
+    if(from && new Date(item.time) < new Date(from)) return false;
+    if(to && new Date(item.time) > new Date(new Date(to).getTime() + 24*3600*1000 - 1)) return false;
+    return true;
+  });
+  renderList(state.filtered);
+}
+
+/* ----------------------
+   新增记录（右侧表单）
+   ---------------------- */
+const newForm = document.querySelector('.new-form');
+const elNewTitle = document.getElementById('newTitle');
+const elNewTags = document.getElementById('newTags');
+const elNewBody = document.getElementById('newBody');
+const btnSaveNew = document.getElementById('saveNew');
+const btnClearNew = document.getElementById('clearNew');
+const btnNew = document.getElementById('newBtn');
+
+// 点击“新增记录”按钮显示/隐藏表单
+btnNew.addEventListener('click', () => {
+  if (newForm.style.display === 'block') {
+    newForm.style.display = 'none';
+  } else {
+    newForm.style.display = 'block';
+    elNewTitle.focus(); // 显示表单后聚焦标题
+  }
+});
+
+// 清空表单
+btnClearNew.addEventListener('click', () => {
+  elNewTitle.value = '';
+  elNewTags.value = '';
+  elNewBody.value = '';
+});
+
+// 保存新记录
+btnSaveNew.addEventListener('click', () => {
+  const title = (elNewTitle.value || '').trim();
+  const body = (elNewBody.value || '').trim();
+  const rawTags = (elNewTags.value || '').trim();
+
+  if (!title) { alert('请填写标题。'); return; }
+  if (!body) { alert('请填写内容。'); return; }
+
+  const tags = rawTags ? rawTags.split(',').map(s => s.trim()).filter(Boolean) : [];
+  if (!tags.length) { alert('请分类标签。'); return; }
+
+  const obj = {
+    id: makeId(),             
+    time: new Date().toISOString(),
+    title: title,
+    body: body,
+    tags: tags,
+    strikeTags: [],
+    sealed: false
+  };
+
+  // 添加到数据并刷新界面
+  state.data.unshift(obj);
+  saveData(state.data);
+  applyFilters();
+  selectEntry(obj.id);
+  renderTagsSidebar(Array.from(new Set(state.data.flatMap(item => item.tags || []))));
+  saveTags(Array.from(new Set(state.data.flatMap(item => item.tags || [])))); // 保存标签
+
+  //保存后隐藏表单并清空内容
+  newForm.style.display = 'none';
+  elNewTitle.value = '';
+  elNewTags.value = '';
+  elNewBody.value = '';
+});
+
+/* ----------------------
+   动态新增标签筛选按钮
+   ---------------------- */
+function renderTagsSidebar(tags) {
+  const filtersContainer = document.querySelector('.filters > div:nth-child(2)');
+  if (!filtersContainer) return;
+
+  // 清理已有动态标签（避免重复）
+  Array.from(filtersContainer.querySelectorAll('.chip')).forEach(chip => {
+    if (!['all','ops','recon','legal','audit','deauth','finance','cleanup'].includes(chip.dataset.filter)) {
+      chip.remove();
+    }
+  });
+
+  tags.forEach(tag => {
+    if (filtersContainer.querySelector(`.chip[data-filter="${tag}"]`)) return;
+
+    const chip = document.createElement('span');
+    chip.className = 'chip';
+    chip.dataset.filter = tag;
+    chip.textContent = tag.toUpperCase();
+    chip.style.opacity = '';
+
+    filtersContainer.appendChild(chip);
+  });
+}
+
+// 点击事件委托（静态+动态标签统一）
+document.querySelector('.filters > div:nth-child(2)').addEventListener('click', (e) => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+
+  document.querySelectorAll('.chip').forEach(c => c.style.opacity = 0.6);
+  chip.style.opacity = 1;
+
+  const filterValue = chip.dataset.filter;
+  inputQ.value = filterValue === 'all' ? '' : filterValue;
+  applyFilters();
+});
+
+/* ----------------------
+   页面初始化
+   ---------------------- */
+applyFilters();
+
+// 加载已有标签
+const savedTags = loadTags();
+renderTagsSidebar(savedTags);
+
+// 如果有日志，选中第一条
+if (state.filtered.length) selectEntry(state.filtered[0].id);
+
+// 搜索/时间绑定
+inputQ.addEventListener('input', applyFilters);
+inputFrom.addEventListener('change', applyFilters);
+inputTo.addEventListener('change', applyFilters);
+
+
+/* ----------------------
+   导出
+   ---------------------- */
+const exportBtn = document.getElementById('exportBtn');
+const exportMenu = document.getElementById('exportMenu');
+
+exportBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  exportMenu.style.display = exportMenu.style.display === 'block' ? 'none' : 'block';
+});
+
+exportMenu.querySelectorAll('.export-option').forEach(option => {
+  option.addEventListener('click', () => {
+    const type = option.dataset.type;
+    exportLogs(type);
+    exportMenu.style.display = 'none';
+  });
+});
+
+document.addEventListener('click', () => {
+  exportMenu.style.display = 'none';
+});
+
+function exportLogs(type){
+  const logs = state.filtered.length ? state.filtered : state.data;
+  const lines = logs.map(item=>{
+    const sealedState = item.sealed ? "已封存" : "活动";
+    const tagDisplay = (item.tags||[]).map(t=>{
+      if (Array.isArray(item.strikeTags) && item.strikeTags.includes(t)) return `${t} (已划线)`;
+      return t;
+    }).join(", ");
+    return `【${item.id}】 ${item.title}
+──────────────
+时间：${item.time}
+状态：${sealedState}
+标签：${tagDisplay}
+──────────────
+${item.body}
+==================================================`;
+  });
+
+  if(type === 'txt'){
+    const blob = new Blob([lines.join("\n\n")], { type: "text/plain;charset=utf-8" });
+    downloadBlob(blob, 'Arzu_worklog_export.txt');
+  }
+  else if(type === 'doc'){
+    const htmlContent = `
+      <html><head><meta charset="UTF-8"></head><body>
+      ${lines.map(l => l.replace(/\n/g,'<br>')).join('<br><br>')}
+      </body></html>`;
+    const blob = new Blob([htmlContent], { type: "application/msword;charset=utf-8" });
+    downloadBlob(blob, 'Arzu_worklog_export.doc');
+  }
+}
+
+function downloadBlob(blob, filename){
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+
+/* ----------------------
+   首次点击提示（一次性）
+   ---------------------- */
+function showFirstClickNotice(){
+  if(state.firstClickShown) return;
+  state.firstClickShown = true;
+  alert('您的所有行动均已进入后台实时监控范围，请严格遵循执行条令2-000001规范操作。');
+  document.removeEventListener('click', firstClickHandler, true);
+}
+function firstClickHandler(e){
+  showFirstClickNotice();
+}
+document.addEventListener('click', firstClickHandler, true);
+
+/* ----------------------
+   启动渲染
+   ---------------------- */
+applyFilters();
+if(state.filtered.length) selectEntry(state.filtered[0].id);
+
+/* ----------------------
+   安全过滤函数
+   ---------------------- */
+function sanitizeHTML(str) {
+  if (typeof str !== 'string') return '';
+  const div = document.createElement('div');
+  div.innerHTML = str;
+  const nodes = Array.from(div.querySelectorAll('*'));
+  nodes.forEach(node => {
+    const tag = node.tagName.toLowerCase();
+    if (tag === 'a') {
+      const href = node.getAttribute('href') || '';
+      if (/^\s*(javascript:|data:)/i.test(href)) {
+        node.replaceWith(document.createTextNode(node.textContent));
+      } else {
+        node.classList.add('fake-link');
+        node.dataset.target = href.replace(/^fake-link:/, '') || node.textContent;
+        node.removeAttribute('href');
+      }
+    } else {
+      node.replaceWith(document.createTextNode(node.textContent));
+    }
+  });
+  return div.innerHTML;
+}
+
+/* ----------------------
+   访问警告机制
+   ---------------------- */
+document.addEventListener('click', (e) => {
+  const link = e.target.closest('.fake-link');
+  if (!link) return;
+
+  e.preventDefault();
+
+  // 创建黑屏覆盖层
+  const overlay = document.createElement('div');
+  overlay.style.cssText = `
+    position: fixed; inset: 0;
+    background: black;
+    color: #ff4040;
+    font-family: monospace;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 9999;
+    font-size: 28px;
+    padding: 40px;
+    text-align: center;
+  `;
+  overlay.innerHTML = `
+    <div>
+      <div style="font-size:50px; font-weight:bold; margin-bottom:20px;">ACCESS DENIED</div>
+      <div style="color:#ccc; font-size:30px; margin-bottom:20px;">未经授权访问：${link.dataset.target}</div>
+      <div style="margin-top:15px; color:#888; font-size:20px;">[ 记录已上报至监控节点 ]</div>
+      <div style="margin-top:30px;">
+        <button id="closeError" style="background:none;border:2px solid #ff4040;color:#ff4040;padding:12px 24px;cursor:pointer;font-size:24px;">返回</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  // 点击关闭
+  overlay.querySelector('#closeError').addEventListener('click', () => {
+    overlay.remove();
+
+    // 自动生成失败日志，使用现有 makeId() 生成顺序 ID
+    const entry = {
+      id: makeId(),
+      time: new Date().toISOString(),
+      title: `系统警告：访问失败-${link.dataset.target}`,
+      body: `尝试访问节点 ${link.dataset.target} 时被阻断。\n系统返回错误：ACCESS_DENIED (403).\n已登记至监控记录。`,
+      tags: ["security","error"],
+      sealed: false
+    };
+
+    state.data.unshift(entry);
+    saveData(state.data);
+    applyFilters();
+    selectEntry(entry.id);
+
+    // 将这条日志的 tags 加入左侧标签栏
+    addNewTagsToSidebar(entry.tags);
+  });
+});
+
+</script>
+</body>
+</html>
